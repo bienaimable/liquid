@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+      <link href="https://fonts.googleapis.com/css?family=Didact+Gothic" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <title>Sherlock</title>
+</head>
+<body>
+      <section id="parameters"></section>
+      <!-- Libraries -->
+      <script src="https://unpkg.com/react@15/dist/react.js"></script>
+      <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+      <!-- Components -->
+      <script src="partners.js"></script>
+      <script src="advertisers.js"></script>
+      <!-- App -->
+<script>
+"use strict"
+
+let _ = React.createElement
+
+class Parameters extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {}
+  }
+  render() {
+    return _( "section", {className: "card"},
+        _("div", {className: "card-content"},
+            _("span", {className: "card-title"}, "What do you want to investigate?"),
+            _("p", null, 
+                "Tell Sherlock what you want to look into, so he can gather clues"),
+            _( "div", { className: "input-field" },
+                _( "select", {id: "metric"}, 
+                    _( "option", { value: "", disabled: true, selected: true },
+                        "Choose your option"
+                    ),
+                    _( "option", { value: "cos" }, "COS"),
+                    _( "option", { value: "cr" }, "CR"),
+                    _( "option", { value: "ctr" }, "CTR"),
+                    _( "option", { value: "rext" }, "REXT"),
+                    _( "option", { value: "spend" }, "Spend")
+                ),
+                _("label", {htmlFor: "metric"}, "Metric"),
+            ),
+            _("label", {htmlFor: "start_date"}, "Start Date"),
+            _("input", {id: "start_date", type: "text", className: "datepicker"}),
+            _("label", {htmlFor: "end_date"}, "End Date"),
+            _("input", {id: "end_date", type: "text", className: "datepicker"}),
+            _("div", {className: "input-field"},
+                _("input", {id: "client_id", type: "text", className: "autocomplete"}),
+                _("label", {htmlFor: "client_id"}, "Client"),
+            ),
+            _("div", {className: "input-field"},
+                _("input", {id: "partner_id", type: "text", className: "autocomplete"}),
+                _("label", {htmlFor: "partner_id"}, "Partner"),
+            ),
+            _("div", {className: "input-field"},
+                _("input", {id: "campaign_id", type: "text", className: "autocomplete"}),
+                _("label", {htmlFor: "campaign_id"}, "Campaign ID"),
+            ),
+        ),
+        //_("div", {className: "card-action"},
+        //    _("a", {href: "#"}, "Start investigation"),
+        //),
+    )
+  }
+}
+
+ReactDOM.render(
+  _(Parameters, null),
+  document.getElementById('parameters')
+)
+document.addEventListener('DOMContentLoaded', function() {
+  var elems = document.querySelectorAll('select');
+  var instances = M.FormSelect.init(elems, {});
+});
+document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.datepicker');
+    var instances = M.Datepicker.init(elems, {});
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('#client_id');
+    var instances = M.Autocomplete.init(elems, {data: cto_advertisers, limit: 5, minLength: 3});
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('#partner_id');
+    var instances = M.Autocomplete.init(elems, {data: cto_partners, limit: 5, minLength: 3});
+  });
+
+</script>
+</body>
+</html>
