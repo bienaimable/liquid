@@ -34,165 +34,18 @@
     <section class="application">
       <section class="header">Sherlock</section>
       <section class="content">
-        <section id="cards"></section>
+        <section id="card_slot"></section>
       </section>
     </section>
       <!-- Libraries -->
-      <script src="https://unpkg.com/react@15/dist/react.js"></script>
-      <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+      <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+      <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
       <!-- Components -->
       <script src="partners.js"></script>
       <script src="advertisers.js"></script>
+      <script src="static/js/components.js"></script>
       <!-- App -->
-<script>
-"use strict"
-
-let _ = React.createElement
-
-
-class MetricCard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {}
-  }
-  render() {
-    return _(
-        "div", {className: "card"},
-            _("div", {className: "card-content"},
-                _("span", {className: "card-title"}, "What do you want to investigate?"),
-                _("p", null, 
-                    ""),
-                _( "div", { className: "input-field" },
-                    _( "select", {id: "metric", value: ""}, 
-                        _( "option", { value: "", disabled: true },
-                            "Choose a metric"
-                        ),
-                        _( "option", { value: "cos" }, "COS"),
-                        _( "option", { value: "cr" }, "CR"),
-                        _( "option", { value: "ctr" }, "CTR"),
-                        _( "option", { value: "rext" }, "REXT"),
-                        _( "option", { value: "spend" }, "Spend")
-                    ),
-                    _("label", {htmlFor: "metric"}, "Metric"),
-                ),
-                _("div", {className: "card-action"},
-                _("a", {href: 'javascript:void(0)', onClick: () => this.props.handler('next')}, "Next"),
-                ),
-            )
-        )
-  }
-}
-
-class DatesCard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {}
-  }
-  render() {
-    return _(
-        "section", {className: "card"}, 
-        "div", {className: "card-content"},
-            _("span", {className: "card-title"}, "What do you want to investigate?"),
-            _("p", null, 
-                ""),
-            _( "div", { className: "input-field" },
-                _( "select", {id: "metric", value: ""}, 
-                    _( "option", { value: "", disabled: true },
-                        "Choose a metric"
-                    ),
-                    _( "option", { value: "cos" }, "COS"),
-                    _( "option", { value: "cr" }, "CR"),
-                    _( "option", { value: "ctr" }, "CTR"),
-                    _( "option", { value: "rext" }, "REXT"),
-                    _( "option", { value: "spend" }, "Spend")
-                ),
-                _("label", {htmlFor: "metric"}, "Metric"),
-            ),
-            _("div", {className: "card-action"},
-                _("button", {onClick: () => this.props.handler('next')}, "Next"),
-            ),
-        )
-  }
-}
-
-
-class Card extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {}
-    this.handler = this.handler.bind(this)
-  }
-  handler(e) {
-    console.log(e)
-    this.setState({
-      action_value: e.value
-    })
-  }
-  render() {
-    return _(
-        "section", null, 
-            _(MetricCard, {handler: this.handler}),
-        )
-        //_("div", {className: "card-content"},
-        //    _("span", {className: "card-title"}, "What do you want to investigate?"),
-        //    _("p", null, 
-        //        ""),
-        //    _( "div", { className: "input-field" },
-        //        _( "select", {id: "metric", value: ""}, 
-        //            _( "option", { value: "", disabled: true },
-        //                "Choose a metric"
-        //            ),
-        //            _( "option", { value: "cos" }, "COS"),
-        //            _( "option", { value: "cr" }, "CR"),
-        //            _( "option", { value: "ctr" }, "CTR"),
-        //            _( "option", { value: "rext" }, "REXT"),
-        //            _( "option", { value: "spend" }, "Spend")
-        //        ),
-        //        _("label", {htmlFor: "metric"}, "Metric"),
-        //    ),
-        //    //_("label", {htmlFor: "start_date"}, "Start Date"),
-        //    //_("input", {id: "start_date", type: "text", className: "datepicker"}),
-        //    //_("label", {htmlFor: "end_date"}, "End Date"),
-        //    //_("input", {id: "end_date", type: "text", className: "datepicker"}),
-        //    //_("div", {className: "input-field"},
-        //    //    _("input", {id: "client_id", type: "text", className: "autocomplete"}),
-        //    //    _("label", {htmlFor: "client_id"}, "Client"),
-        //    //),
-        //    //_("div", {className: "input-field"},
-        //    //    _("input", {id: "partner_id", type: "text", className: "autocomplete"}),
-        //    //    _("label", {htmlFor: "partner_id"}, "Partner"),
-        //    //),
-        //    //_("div", {className: "input-field"},
-        //    //    _("input", {id: "campaign_id", type: "text", className: "autocomplete"}),
-        //    //    _("label", {htmlFor: "campaign_id"}, "Campaign ID"),
-        //    //),
-        //),
-  }
-}
-
-ReactDOM.render(
-  _(Card, null),
-  document.getElementById('cards')
-)
-
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('select');
-  var instances = M.FormSelect.init(elems, {});
-});
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('.datepicker');
-  var instances = M.Datepicker.init(elems, {});
-});
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('#client_id');
-  var instances = M.Autocomplete.init(elems, {data: cto_advertisers, limit: 5, minLength: 3});
-});
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('#partner_id');
-  var instances = M.Autocomplete.init(elems, {data: cto_partners, limit: 5, minLength: 3});
-});
-
-</script>
+      <script src="static/js/init.js"></script>
 </body>
 </html>
