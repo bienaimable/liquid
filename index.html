@@ -29,10 +29,14 @@
     grid-area: content;
     padding-top: 3em;
 }
+a {
+  color: black;
+  text-decoration: none; /* no underline */
+}
 </style>
 <body>
     <section class="application">
-      <section class="header">Sherlock</section>
+      <section class="header"><a href='./index.html'>Sherlock</a></section>
       <section class="content">
         <section id="card_slot"></section>
       </section>
@@ -41,6 +45,7 @@
       <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
       <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+      <script src="https://unpkg.com/moment@2.22.2/moment.js"></script>
       <!-- Components -->
       <script src="partners.js"></script>
       <script src="advertisers.js"></script>

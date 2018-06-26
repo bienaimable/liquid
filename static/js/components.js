@@ -1,210 +1,189 @@
 "use strict"
 
 
-class MetricCard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {}
-  }
-  render() {
-    return _(
-        "div", {className: "card"},
-            _("div", {className: "card-content"},
-                _("span", {className: "card-title"}, this.props.title),
-                _("p", null, 
-                    ""),
-                _( "div", { className: "input-field" },
-                    _( "select", {id: "metric", value: ""}, 
-                        _( "option", { value: "", disabled: true },
-                            "Choose a metric"
-                        ),
-                        _( "option", { value: "cos" }, "COS"),
-                        _( "option", { value: "cr" }, "CR"),
-                        _( "option", { value: "ctr" }, "CTR"),
-                        _( "option", { value: "rext" }, "REXT"),
-                        _( "option", { value: "spend" }, "Spend")
-                    ),
-                    _("label", {htmlFor: "metric"}, "Metric"),
-                ),
-                _("div", {className: "card-action"},
-                _("a", {href: 'javascript:void(0)', onClick: () => this.props.handler('dates')}, "Next"),
-                ),
-            )
-        )
-  }
-}
-
-class DatesCard extends React.Component {
+class SelectInput extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            input_id: Math.random().toString().slice(2,18),
+        }
     }
     componentDidMount() {
-            var elems = document.querySelectorAll('.datepicker');
-            var instances = M.Datepicker.init(elems, {});
+        var element = document.getElementById(this.state.input_id)
+        var instances = M.FormSelect.init(element, {});
     }
     render() {
-        let buttons = this.props.buttons.map( x => 
-            _(
-                "a", 
-                {
-                    href: 'javascript:void(0)', 
-                    onClick: () => this.props.handler(x.node)
-                }, 
-                x.name
+        let options = this.props.source.map(
+            option => _( "option", { value: option, key: option }, option),
+        )
+        options.unshift(
+            _( "option", { key: "label",  value: "", disabled: true },
+                this.props.label || "Choose an option"
             )
         )
-        return _("div", {className: "card"},
-                _("div", {className: "card-content"},
-                    _("span", {className: "card-title"}, "Choose date range"),
-                    _( "div", {className: "input-field"},
-                        _("label", {htmlFor: "start_date"}, "Start Date"),
-                        _("input", {id: "start_date", type: "text", className: "datepicker"}),
-                        _("label", {htmlFor: "end_date"}, "End Date"),
-                        _("input", {id: "end_date", type: "text", className: "datepicker"}),
-                    ),
-                    _("div", {className: "card-action"},
-                        buttons,
-                    ),
-                )
-        )
+        return [
+            _( "div", { key: '1', className: "input-field" },
+                _( "select", 
+                    {
+                        id: this.state.input_id,
+                        value: this.props.value || "", 
+                        onChange: (e) => this.props.update(e.target.value)
+                    }, 
+                    options,
+                ),
+            ),
+        ]
     }
 }
-var tree = {
-    'home': {card_type: MetricCard, 
-             props: {
-                 title: "Choose your metric",
-                 buttons: [
-                     {name: "Next", node: 'dates'},
-                 ],
-             }
-            },
-    'dates': {
-        card_type: DatesCard, 
-        props: {
-            title: "Choose your dates",
-            buttons: [
-                {name: "Previous", node: 'home'},
-                {name: "Next", node: 'metric'},
-            ],
-        }
-    },
-    'metric2': {card_type: MetricCard, props: {title: "Choose another metric"}},
-}
 
-
-class CardSlot extends React.Component {
+class DateInput extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { node: "home" }
-        this.handler = this.handler.bind(this)
+        this.state = {
+            input_id: Math.random().toString().slice(2,18),
+        }
     }
-    handler(value) {
-        this.setState({node: value})
+    componentDidMount() {
+        var element = document.getElementById(this.state.input_id)
+        let instance = M.Datepicker.init(element, {
+            onSelect: (date) => this.props.update(moment(date).format('YYYY-MM-DD')),
+        })
     }
     render() {
-        let props = Object.assign({handler: this.handler}, tree[this.state.node]['props'])
-        let component = tree[this.state.node]['card_type']
-        return _(component, props)
+        return [
+            _("div", {key: "input-field", className: "input-field"},
+                _("input", {
+                    key: this.state.input_id, 
+                    id: this.state.input_id,
+                    type: "text", 
+                    className: "datepicker"
+                }),
+                _("label", {key: 'label', htmlFor: this.state.input_id}, 
+                    this.props.label || "Choose a date"
+                ),
+            ),
+        ]
     }
 }
+
+class AutocompleteInput extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            input_id: Math.random().toString().slice(2,18),
+        }
+    }
+    refresh() {
+        var elems = document.getElementById(this.state.input_id)
+        var instances = M.Autocomplete.init(elems, {
+            data: this.props.source, 
+            limit: 5, 
+            minLength: 0,
+            onAutocomplete: (value) => this.props.update(value),
+        })
+    }
+    componentDidMount() {this.refresh()}
+    //componentDidUpdate() {this.refresh()}
+    render() {
+        return [
+            _("div", {key: this.props.label, className: "input-field"},
+                _("input", {
+                    id: this.state.input_id, 
+                    type: "text", 
+                    className: "autocomplete"}),
+                _("label", {htmlFor: this.state.input_id}, this.props.label),
+            ),
+        ]
+    }
+}
+
+class MessageCard extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        return [
+            _("section", {key: '1'}, this.props.label),
+        ]
+    }
+}
+
 
 class Card extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { node: "home" }
-        this.handler = this.handler.bind(this)
-    }
-    handler(value) {
-        this.setState({node: value})
-    }
-    render() {
-        let props = Object.assign({handler: this.handler}, tree[this.state.node]['props'])
-        let component = tree[this.state.node]['card_type']
-        return _(component, props)
-    }
-}
-class DatesCard extends React.Component {
-    constructor(props) {
-        super(props);
         this.state = {}
     }
-    componentDidMount() {
-            var elems = document.querySelectorAll('.datepicker');
-            var instances = M.Datepicker.init(elems, {});
-    }
     render() {
-        let buttons = this.props.buttons.map( x => 
+        let node = this.props.node
+        let input_props = Object.assign(
+            { update: (value) => this.props.update([node.variable], value) },
+            node.parameters)
+        return [
+            _("div", {key: 'key', className: "card"},
+                _("div", {className: "card-content"},
+                    _("span", {className: "card-title"}, node.title),
+                    _(node['card_type'], input_props),
+                    _("div", {className: "card-action"},
+                        this.props.buttons,
+                    ),
+                )
+            )
+        ]
+    }
+}
+
+class CardList extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            visited_node_names: ["home"],
+        }
+    }
+    componentDidUpdate() {
+        window.scrollTo(0,document.body.scrollHeight)
+    }
+
+    render() {
+        console.log(this.state)
+        let cards = this.state.visited_node_names.map(
+            node_name =>
+            _(Card, {
+                key: node_name, 
+                node: nodes[node_name], 
+                update: (variable, value) => this.setState({[variable]: value}),
+                buttons: [],
+            })
+        )
+        let last_node_name = this.state.visited_node_names.slice(-1)[0]
+        let node = nodes[last_node_name]
+        let buttons = node.buttons.map( button => 
             _(
                 "a", 
                 {
-                    href: 'javascript:void(0)', 
-                    onClick: () => this.props.handler(x.node)
+                    key: button.name + button.destination,
+                    href: 'javascript:void(0)',
+                    onClick: () => {
+                        this.setState({
+                            visited_node_names: [ 
+                                ...this.state.visited_node_names, 
+                                button.destination
+                            ]
+                        })
+                    }
                 }, 
-                x.name
+                button.name
             )
         )
-        return _("div", {className: "card"},
-                _("div", {className: "card-content"},
-                    _("span", {className: "card-title"}, "Choose date range"),
-                    _( "div", {className: "input-field"},
-                        _("label", {htmlFor: "start_date"}, "Start Date"),
-                        _("input", {id: "start_date", type: "text", className: "datepicker"}),
-                        _("label", {htmlFor: "end_date"}, "End Date"),
-                        _("input", {id: "end_date", type: "text", className: "datepicker"}),
-                    ),
-                    _("div", {className: "card-action"},
-                        buttons,
-                    ),
-                )
+        cards.pop()
+        cards.push(
+            _(Card, {
+                key: last_node_name, 
+                node: nodes[last_node_name], 
+                update: (variable, value) => this.setState({['var_'+variable]: value}),
+                buttons: buttons,
+            })
         )
+        return cards
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('select');
-  var instances = M.FormSelect.init(elems, {});
-});
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('#client_id');
-  var instances = M.Autocomplete.init(elems, {data: cto_advertisers, limit: 5, minLength: 3});
-});
-document.addEventListener('DOMContentLoaded', function() {
-  var elems = document.querySelectorAll('#partner_id');
-  var instances = M.Autocomplete.init(elems, {data: cto_partners, limit: 5, minLength: 3});
-});
-
-        //_("div", {className: "card-content"},
-        //    _("span", {className: "card-title"}, "What do you want to investigate?"),
-        //    _("p", null, 
-        //        ""),
-        //    _( "div", { className: "input-field" },
-        //        _( "select", {id: "metric", value: ""}, 
-        //            _( "option", { value: "", disabled: true },
-        //                "Choose a metric"
-        //            ),
-        //            _( "option", { value: "cos" }, "COS"),
-        //            _( "option", { value: "cr" }, "CR"),
-        //            _( "option", { value: "ctr" }, "CTR"),
-        //            _( "option", { value: "rext" }, "REXT"),
-        //            _( "option", { value: "spend" }, "Spend")
-        //        ),
-        //        _("label", {htmlFor: "metric"}, "Metric"),
-        //    ),
-        //    //_("label", {htmlFor: "start_date"}, "Start Date"),
-        //    //_("input", {id: "start_date", type: "text", className: "datepicker"}),
-        //    //_("label", {htmlFor: "end_date"}, "End Date"),
-        //    //_("input", {id: "end_date", type: "text", className: "datepicker"}),
-        //    //_("div", {className: "input-field"},
-        //    //    _("input", {id: "client_id", type: "text", className: "autocomplete"}),
-        //    //    _("label", {htmlFor: "client_id"}, "Client"),
-        //    //),
-        //    //_("div", {className: "input-field"},
-        //    //    _("input", {id: "partner_id", type: "text", className: "autocomplete"}),
-        //    //    _("label", {htmlFor: "partner_id"}, "Partner"),
-        //    //),
-        //    //_("div", {className: "input-field"},
-        //    //    _("input", {id: "campaign_id", type: "text", className: "autocomplete"}),
-        //    //    _("label", {htmlFor: "campaign_id"}, "Campaign ID"),
-        //    //),
-        //),
