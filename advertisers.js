@@ -1,8 +1,12 @@
-var cto_advertisers = {
-  "17923 - (DO NOT USE) Isaora US": null,
-  "1545 - (duplicate)Olymp Shop DE": null,
-  "15935 - (Duplicated) Distorted People DE": null,
-  "30967 - (inté) EzyQuad Fr": null,
+var cto_advertisers = [
+  "17923 - (do not use) isaora us",
+  "1545 - (duplicate)olymp shop de",
+]
+var cto_advertisers2 = {
+  "17923 - (do not use) isaora us": null,
+  "1545 - (duplicate)olymp shop de": null,
+  "15935 - (duplicated) distorted people de": null,
+  "30967 - (inté) ezyquad fr": null,
   "7647 - (integration) CPS Distribution FR": null,
   "8670 - (old account) Bonprix KZ": null,
   "2802 - (old account) Bonprix RU": null,

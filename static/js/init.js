@@ -7,9 +7,8 @@ var nodes = {
         title: "Choose your metric",
         variable: "metric",
         parameters: {
-            source: ['CR', 'COS', 'Spend'],
-            source: (load) => {
-                load(['CR', 'COS', 'Spend'])
+            source: (callback, variables) => {
+                setTimeout(() => callback(['CR', 'COS', 'Spend']), 2000)
             },
         },
         buttons: [
@@ -40,7 +39,7 @@ var nodes = {
         variable: "client",
         parameters: {
             label: "Client",
-            source: cto_advertisers,
+            source: (callback, variables) => callback(cto_advertisers),
         },
         buttons: [
             {name: "Previous", destination: 'enddate'},
@@ -53,7 +52,30 @@ var nodes = {
         variable: "partner",
         parameters: {
             label: "Partner",
-            source: cto_partners,
+            source: (callback, variables) => {
+                let url = "http://watson.oea.criteois.lan/api/v1/query/sherlock/partner_lookup?client_id="
+                fetch(
+                    url+variables.client.split(" - ")[0], {method: 'POST'}
+                ).then(
+                    response => response.json()
+                ).then(
+                    json => {
+                        let redirect = json.result
+                        fetch(
+                            "http://watson.oea.criteois.lan"+redirect
+                        ).then(
+                            response => response.json()
+                        ).then(
+                            json => {
+                                console.log(json)
+                                callback(json.results.map(
+                                    result => result.partner_id + " - " + result.partner_name
+                                ))
+                            }
+                        )
+                    }
+                )
+            }
         },
         buttons: [
             {name: "Previous", destination: 'client'},
@@ -66,7 +88,7 @@ var nodes = {
         variable: "campaign",
         parameters: {
             label: "Campaign",
-            source: {'Campaign 1': null, 'Campaign 2': null},
+            source: (callback, variables) => callback({'Campaign 1': null, 'Campaign 2': null}),
         },
         buttons: [
             {name: "Previous", destination: 'client'},
@@ -76,6 +98,7 @@ var nodes = {
     'end': {
         card_type: MessageCard, 
         title: "Done",
+        variable: null,
         parameters: {
             label: "Investigation complete",
         },

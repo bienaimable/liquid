@@ -13,7 +13,7 @@ class SelectInput extends React.Component {
         var instances = M.FormSelect.init(element, {});
     }
     render() {
-        let options = this.props.source.map(
+        let options = this.props.data.map(
             option => _( "option", { value: option, key: option }, option),
         )
         options.unshift(
@@ -74,9 +74,13 @@ class AutocompleteInput extends React.Component {
         }
     }
     refresh() {
+        let data = {}
+        for (let row of this.props.data){
+            data[row] = null
+        }
         var elems = document.getElementById(this.state.input_id)
         var instances = M.Autocomplete.init(elems, {
-            data: this.props.source, 
+            data: data, 
             limit: 5, 
             minLength: 0,
             onAutocomplete: (value) => this.props.update(value),
@@ -112,13 +116,44 @@ class MessageCard extends React.Component {
 class Card extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            loaded: false,
+            data: [],
+        }
+    }
+    componentDidMount() {
+        console.log(this.props.variables)
+        let node = this.props.node
+        if ('parameters' in node && 'source' in node.parameters){
+            node.parameters.source( 
+                (values) => this.setState({
+                    loaded: true,
+                    data: values,
+                }),
+                this.props.variables
+            )
+        } else {
+            this.setState({loaded: true})
+        }
     }
     render() {
         let node = this.props.node
+        if (!(this.state.loaded)) { 
+            return [ 
+                _("div", {key: 'key', className: "card"},
+                    _("div", {className: "card-content"},
+                        "Loading data...",
+                    )
+                )
+            ]
+        }
         let input_props = Object.assign(
-            { update: (value) => this.props.update([node.variable], value) },
-            node.parameters)
+            { 
+                update: (value) => this.props.update([node.variable], value),
+                data: this.state.data,
+            },
+            node.parameters
+        )
         return [
             _("div", {key: 'key', className: "card"},
                 _("div", {className: "card-content"},
@@ -138,12 +173,20 @@ class CardList extends React.Component {
         super(props);
         this.state = {
             visited_node_names: ["home"],
+            variables: {},
         }
+        this.update = (variable, value) => this.setState(
+            {
+                variables: Object.assign(
+                    {[variable]: value},
+                    this.state.variables
+                )
+            }
+        )
     }
     componentDidUpdate() {
         window.scrollTo(0,document.body.scrollHeight)
     }
-
     render() {
         console.log(this.state)
         let cards = this.state.visited_node_names.map(
@@ -151,7 +194,8 @@ class CardList extends React.Component {
             _(Card, {
                 key: node_name, 
                 node: nodes[node_name], 
-                update: (variable, value) => this.setState({[variable]: value}),
+                variables: this.state.variables,
+                update: this.update,
                 buttons: [],
             })
         )
@@ -180,7 +224,8 @@ class CardList extends React.Component {
             _(Card, {
                 key: last_node_name, 
                 node: nodes[last_node_name], 
-                update: (variable, value) => this.setState({['var_'+variable]: value}),
+                variables: this.state.variables,
+                update: this.update,
                 buttons: buttons,
             })
         )
