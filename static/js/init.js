@@ -8,28 +8,10 @@ var nodes = {
         variable: "metric",
         parameters: {
             source: (callback, variables) => {
-                setTimeout(() => callback(['CR', 'COS', 'Spend']), 2000)
+                setTimeout(() => callback(['CR investigation', 'Account general health']), 500)
             },
         },
         buttons: [
-            {name: "Next", destination: 'startdate'},
-        ],
-    },
-    'startdate': {
-        card_type: DateInput, 
-        title: "Choose your start date",
-        variable: "startdate",
-        buttons: [
-            {name: "Previous", destination: 'home'},
-            {name: "Next", destination: 'enddate'},
-        ],
-    },
-    'enddate': {
-        card_type: DateInput, 
-        title: "Choose your end date",
-        variable: "enddate",
-        buttons: [
-            {name: "Previous", destination: 'startdate'},
             {name: "Next", destination: 'client'},
         ],
     },
@@ -40,9 +22,16 @@ var nodes = {
         parameters: {
             label: "Client",
             source: (callback, variables) => callback(cto_advertisers),
+            //source: (callback, variables) => {
+            //    let url = "https://top.criteo.com/topWs/advertisers/GetAdvertisers?limit=0"
+            //    fetch(url).then(
+            //        response => response.json()
+            //    ).then(
+            //        json => callback(Object.keys(json).map(key => key + " - " + json[key]))
+            //    )
+            //}
         },
         buttons: [
-            {name: "Previous", destination: 'enddate'},
             {name: "Next", destination: 'partner'},
         ],
     },
@@ -52,33 +41,41 @@ var nodes = {
         variable: "partner",
         parameters: {
             label: "Partner",
-            source: (callback, variables) => {
-                let url = "http://watson.oea.criteois.lan/api/v1/query/sherlock/partner_lookup?client_id="
-                fetch(
-                    url+variables.client.split(" - ")[0], {method: 'POST'}
-                ).then(
-                    response => response.json()
-                ).then(
-                    json => {
-                        let redirect = json.result
-                        fetch(
-                            "http://watson.oea.criteois.lan"+redirect
-                        ).then(
-                            response => response.json()
-                        ).then(
-                            json => {
-                                console.log(json)
-                                callback(json.results.map(
-                                    result => result.partner_id + " - " + result.partner_name
-                                ))
-                            }
-                        )
-                    }
-                )
+            source: async (callback, variables, error_handler) => {
+                try {
+                    let host = "http://watson.oea.criteois.lan"
+                    let client_id = variables.client.split(" - ")[0]
+                    let url = `${host}/api/v1/query/sherlock/partner_lookup?client_id=${client_id}`
+                    const query_init = await fetch(url, {method: 'POST'})
+                    if (!query_init.ok) {throw Error(query_init.statusText)}
+                    const query_info = await query_init.json()
+                    let redirect = query_info.result
+                    const response = await fetch(host+redirect)
+                    if (!response.ok || response.status == 204) {throw Error(response.statusText)}
+                    const json = await response.json()
+                    callback(json.results.map(
+                        result => result.partner_id + " - " + result.partner_name
+                    ))
+                } catch(error) {error_handler(error)}
             }
         },
         buttons: [
-            {name: "Previous", destination: 'client'},
+            {name: "Next", destination: 'startdate'},
+        ],
+    },
+    'startdate': {
+        card_type: DateInput, 
+        title: "Choose your start date",
+        variable: "startdate",
+        buttons: [
+            {name: "Next", destination: 'enddate'},
+        ],
+    },
+    'enddate': {
+        card_type: DateInput, 
+        title: "Choose your end date",
+        variable: "enddate",
+        buttons: [
             {name: "Next", destination: 'campaign'},
         ],
     },
@@ -88,10 +85,25 @@ var nodes = {
         variable: "campaign",
         parameters: {
             label: "Campaign",
-            source: (callback, variables) => callback({'Campaign 1': null, 'Campaign 2': null}),
+            source: async (callback, variables, error_handler) => {
+                try {
+                    let host = "http://watson.oea.criteois.lan"
+                    let client_id = variables.client.split(" - ")[0]
+                    let url = `${host}/api/v1/query/sherlock/campaign_lookup?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
+                    const query_init = await fetch(url, {method: 'POST'})
+                    if (!query_init.ok) {throw Error(query_init.statusText)}
+                    const query_info = await query_init.json()
+                    let redirect = query_info.result
+                    const response = await fetch(host+redirect)
+                    if (!response.ok || response.status == 204) {throw Error(response.statusText)}
+                    const json = await response.json()
+                    callback(json.results.map(
+                        result => result.campaign_id + " - " + result.campaign_name
+                    ))
+                } catch(error) {error_handler(error)}
+            }
         },
         buttons: [
-            {name: "Previous", destination: 'client'},
             {name: "Next", destination: 'end'},
         ],
     },
@@ -103,7 +115,6 @@ var nodes = {
             label: "Investigation complete",
         },
         buttons: [
-            {name: "Previous", destination: 'campaign'},
         ],
     },
 }

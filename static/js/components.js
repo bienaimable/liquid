@@ -118,26 +118,59 @@ class Card extends React.Component {
         super(props);
         this.state = {
             loaded: false,
+            error: false,
             data: [],
         }
+        this.errorHandler = this.errorHandler.bind(this)
     }
-    componentDidMount() {
-        console.log(this.props.variables)
+    errorHandler(error) {
+        this.setState({
+            error: true,
+            error_message: error})
+    }
+    getSource() {
         let node = this.props.node
         if ('parameters' in node && 'source' in node.parameters){
-            node.parameters.source( 
-                (values) => this.setState({
-                    loaded: true,
-                    data: values,
-                }),
-                this.props.variables
-            )
+                node.parameters.source( 
+                    (values) => this.setState({
+                        loaded: true,
+                        data: values,
+                    }),
+                    this.props.variables,
+                    this.errorHandler,
+                )
         } else {
             this.setState({loaded: true})
         }
     }
+    componentDidMount() {this.getSource()}
     render() {
         let node = this.props.node
+        if (this.state.error) { 
+            return [ 
+                _("div", {key: 'key', className: "card"},
+                    _("div", {className: "card-content"},
+                        _("span", {className: "card-title"}, "Error"),
+                        this.state.error_message.toString(),
+                        _("div", {className: "card-action"},
+                            _("a", 
+                                {
+                                    key: 'retry',
+                                    href: 'javascript:void(0)',
+                                    onClick: () => {
+                                        this.setState({loaded: false, error: false})
+                                        this.getSource()
+                                    }
+
+                                }, 
+                                'Retry'
+                            )
+                        ),
+
+                    )
+                )
+            ]
+        }
         if (!(this.state.loaded)) { 
             return [ 
                 _("div", {key: 'key', className: "card"},
@@ -201,7 +234,22 @@ class CardList extends React.Component {
         )
         let last_node_name = this.state.visited_node_names.slice(-1)[0]
         let node = nodes[last_node_name]
-        let buttons = node.buttons.map( button => 
+        let previous_state = this.state.visited_node_names.slice(0, this.state.visited_node_names.length-1)
+        let buttons = [
+            _( "a", 
+                {
+                    key: 'previous_button',
+                    href: 'javascript:void(0)',
+                    onClick: () => {
+                        this.setState({
+                            visited_node_names: previous_state
+                        })
+                    }
+                }, 
+                'Previous'
+            )
+        ]
+        let additional_buttons = node.buttons.map( button => 
             _(
                 "a", 
                 {
@@ -219,6 +267,7 @@ class CardList extends React.Component {
                 button.name
             )
         )
+        buttons = [ ...buttons, ...additional_buttons ]
         cards.pop()
         cards.push(
             _(Card, {
