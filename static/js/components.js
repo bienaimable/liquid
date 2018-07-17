@@ -1,7 +1,7 @@
-"use strict"
+let _ = React.createElement
 
 
-class SelectInput extends React.Component {
+export class SelectInput extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -36,7 +36,7 @@ class SelectInput extends React.Component {
     }
 }
 
-class DateInput extends React.Component {
+export class DateInput extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -66,7 +66,7 @@ class DateInput extends React.Component {
     }
 }
 
-class AutocompleteInput extends React.Component {
+export class AutocompleteInput extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -101,7 +101,7 @@ class AutocompleteInput extends React.Component {
     }
 }
 
-class MessageCard extends React.Component {
+export class MessageCard extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -113,7 +113,7 @@ class MessageCard extends React.Component {
 }
 
 
-class Card extends React.Component {
+export class Card extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -201,7 +201,7 @@ class Card extends React.Component {
     }
 }
 
-class CardList extends React.Component {
+export class CardList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
