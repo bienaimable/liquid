@@ -1,7 +1,6 @@
-import * as Elements from "./components.js"
-let _ = React.createElement
+import * as Elements from "../cards/elements.js"
 
-var nodes = {
+export let nodes = {
     'home': {
         card_type: Elements.SelectInput, 
         title: "Choose your metric",
@@ -21,15 +20,15 @@ var nodes = {
         variable: "client",
         parameters: {
             label: "Client",
-            source: (callback, variables) => callback(cto_advertisers),
-            //source: (callback, variables) => {
-            //    let url = "https://top.criteo.com/topWs/advertisers/GetAdvertisers?limit=0"
-            //    fetch(url).then(
-            //        response => response.json()
-            //    ).then(
-            //        json => callback(Object.keys(json).map(key => key + " - " + json[key]))
-            //    )
-            //}
+            //source: (callback, variables) => callback(cto_advertisers),
+            source: (callback, variables) => {
+                let url = "http://settings.oea.criteois.lan/api/v1/topWs/advertisers/GetAdvertisers?limit=0"
+                fetch(url).then(
+                    response => response.json()
+                ).then(
+                    json => callback(Object.keys(json).map(key => key + " - " + json[key]))
+                )
+            }
         },
         buttons: [
             {name: "Next", destination: 'partner'},
@@ -118,8 +117,3 @@ var nodes = {
         ],
     },
 }
-
-ReactDOM.render(
-    _(Elements.CardList, null),
-    document.getElementById('card_slot')
-)
