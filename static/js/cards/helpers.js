@@ -1,7 +1,12 @@
-"use strict"
+export async function download(url) {
+    let response = await fetch(url, {method: 'GET'})
+    if (!response.ok) {throw Error(response.statusText)}
+    let json = await response.json()
+    return json
+}
 
-async function watson_download(url) {
-    const url = new URL(url)
+export async function watson_download(url) {
+    let url = new URL(url)
     const query_init = await fetch(url.href, {method: 'POST'})
     if (!query_init.ok) {throw Error(query_init.statusText)}
     const query_info = await query_init.json()

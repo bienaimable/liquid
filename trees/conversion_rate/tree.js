@@ -1,38 +1,26 @@
-import * as Elements from "../cards/elements.js"
+import * as Elements from "../../static/js/cards/elements.js"
+import * as Helpers from "../../static/js/cards/helpers.js"
 
 export let nodes = {
-    'home': {
-        card_type: Elements.SelectInput, 
-        title: "Choose your metric",
-        variable: "metric",
-        parameters: {
-            source: (callback, variables) => {
-                setTimeout(() => callback(['CR investigation', 'Account general health']), 500)
-            },
-        },
-        buttons: [
-            {name: "Next", destination: 'client'},
-        ],
-    },
-    'client': {
-        card_type: Elements.AutocompleteInput, 
-        title: "Choose the client",
-        variable: "client",
-        parameters: {
-            label: "Client",
-            //source: (callback, variables) => callback(cto_advertisers),
-            source: (callback, variables) => {
-                let url = "http://settings.oea.criteois.lan/api/v1/topWs/advertisers/GetAdvertisers?limit=0"
-                fetch(url).then(
-                    response => response.json()
-                ).then(
-                    json => callback(Object.keys(json).map(key => key + " - " + json[key]))
-                )
+    'home': async (variables, callback) => {
+        try {
+            let url = "http://settings.oea.criteois.lan/api/v1/topWs/advertisers/GetAdvertisers?limit=0"
+            let json = await Helpers.download(url)
+            let advertisers = Object.keys(json).map(key => key + " - " + json[key])
+            let card = {
+                title: "Client",
+                element: Elements.AutocompleteInput, 
+                element_parameters: {
+                    label: "Client",
+                    variable: "client",
+                    data: advertisers,
+                },
+                buttons: [
+                    {name: "Next", destination: 'partner'},
+                ],
             }
-        },
-        buttons: [
-            {name: "Next", destination: 'partner'},
-        ],
+            callback(card, null)
+        } catch(error) {callback(null, error)}
     },
     'partner': {
         card_type: Elements.AutocompleteInput, 
@@ -45,13 +33,7 @@ export let nodes = {
                     let host = "http://watson.oea.criteois.lan"
                     let client_id = variables.client.split(" - ")[0]
                     let url = `${host}/api/v1/query/sherlock/partner_lookup?client_id=${client_id}`
-                    const query_init = await fetch(url, {method: 'POST'})
-                    if (!query_init.ok) {throw Error(query_init.statusText)}
-                    const query_info = await query_init.json()
-                    let redirect = query_info.result
-                    const response = await fetch(host+redirect)
-                    if (!response.ok || response.status == 204) {throw Error(response.statusText)}
-                    const json = await response.json()
+                    let json = await Helpers.watson_download(url)
                     callback(json.results.map(
                         result => result.partner_id + " - " + result.partner_name
                     ))
@@ -89,13 +71,7 @@ export let nodes = {
                     let host = "http://watson.oea.criteois.lan"
                     let client_id = variables.client.split(" - ")[0]
                     let url = `${host}/api/v1/query/sherlock/campaign_lookup?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
-                    const query_init = await fetch(url, {method: 'POST'})
-                    if (!query_init.ok) {throw Error(query_init.statusText)}
-                    const query_info = await query_init.json()
-                    let redirect = query_info.result
-                    const response = await fetch(host+redirect)
-                    if (!response.ok || response.status == 204) {throw Error(response.statusText)}
-                    const json = await response.json()
+                    let json = await Helpers.watson_download(url)
                     callback(json.results.map(
                         result => result.campaign_id + " - " + result.campaign_name
                     ))
