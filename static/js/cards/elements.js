@@ -27,7 +27,7 @@ export class SelectInput extends React.Component {
                     {
                         id: this.state.input_id,
                         value: this.props.value || "", 
-                        onChange: (e) => this.props.update(e.target.value)
+                        onChange: (e) => this.props.assign(e.target.value)
                     }, 
                     options,
                 ),
@@ -46,7 +46,7 @@ export class DateInput extends React.Component {
     componentDidMount() {
         var element = document.getElementById(this.state.input_id)
         let instance = M.Datepicker.init(element, {
-            onSelect: (date) => this.props.update(moment(date).format('YYYY-MM-DD')),
+            onSelect: (date) => this.props.assign(moment(date).format('YYYY-MM-DD')),
         })
     }
     render() {
@@ -83,7 +83,7 @@ export class AutocompleteInput extends React.Component {
             data: data, 
             limit: 5, 
             minLength: 0,
-            onAutocomplete: (value) => this.props.update(value),
+            onAutocomplete: (value) => this.props.assign(value),
         })
     }
     componentDidMount() {this.refresh()}

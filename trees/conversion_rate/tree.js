@@ -1,8 +1,29 @@
 import * as Elements from "../../static/js/cards/elements.js"
 import * as Helpers from "../../static/js/cards/helpers.js"
+let _ = React.createElement
 
-export let nodes = {
+export let nodes = {}
+// (Optional) Adding external nodes
+import * as SpendTree from "../spend/tree.js"
+nodes = Object.assign(nodes, SpendTree.nodes)
+
+nodes = Object.assign(nodes, {
     'home': async (variables, callback) => {
+        try {
+            let card = {
+                title: "Conversion Rate Investigation",
+                element: Elements.MessageCard, 
+                element_parameters: {
+                    label: "Beginning of report",
+                },
+                buttons: [
+                    {name: "Next", destination: 'client'},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'client': async (variables, callback) => {
         try {
             let url = "http://settings.oea.criteois.lan/api/v1/topWs/advertisers/GetAdvertisers?limit=0"
             let json = await Helpers.download(url)
@@ -22,74 +43,92 @@ export let nodes = {
             callback(card, null)
         } catch(error) {callback(null, error)}
     },
-    'partner': {
-        card_type: Elements.AutocompleteInput, 
-        title: "Choose the partner",
-        variable: "partner",
-        parameters: {
-            label: "Partner",
-            source: async (callback, variables, error_handler) => {
-                try {
-                    let host = "http://watson.oea.criteois.lan"
-                    let client_id = variables.client.split(" - ")[0]
-                    let url = `${host}/api/v1/query/sherlock/partner_lookup?client_id=${client_id}`
-                    let json = await Helpers.watson_download(url)
-                    callback(json.results.map(
-                        result => result.partner_id + " - " + result.partner_name
-                    ))
-                } catch(error) {error_handler(error)}
+    'partner': async (variables, callback) => {
+        try {
+            let client_id = variables.client.split(" - ")[0]
+            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/partner_lookup?client_id=${client_id}`
+            let json = await Helpers.watson_download(url)
+            let partners = json.results.map(
+                result => result.partner_id + " - " + result.partner_name )
+            let card = {
+                title: "Partner",
+                element: Elements.AutocompleteInput, 
+                element_parameters: {
+                    label: "Partner",
+                    variable: "Partner",
+                    data: partners,
+                },
+                buttons: [
+                    {name: "Next", destination: 'startdate'},
+                ],
             }
-        },
-        buttons: [
-            {name: "Next", destination: 'startdate'},
-        ],
+            callback(card, null)
+        } catch(error) {callback(null, error)}
     },
-    'startdate': {
-        card_type: Elements.DateInput, 
-        title: "Choose your start date",
-        variable: "startdate",
-        buttons: [
-            {name: "Next", destination: 'enddate'},
-        ],
-    },
-    'enddate': {
-        card_type: Elements.DateInput, 
-        title: "Choose your end date",
-        variable: "enddate",
-        buttons: [
-            {name: "Next", destination: 'campaign'},
-        ],
-    },
-    'campaign': {
-        card_type: Elements.AutocompleteInput, 
-        title: "Choose the campaign",
-        variable: "campaign",
-        parameters: {
-            label: "Campaign",
-            source: async (callback, variables, error_handler) => {
-                try {
-                    let host = "http://watson.oea.criteois.lan"
-                    let client_id = variables.client.split(" - ")[0]
-                    let url = `${host}/api/v1/query/sherlock/campaign_lookup?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
-                    let json = await Helpers.watson_download(url)
-                    callback(json.results.map(
-                        result => result.campaign_id + " - " + result.campaign_name
-                    ))
-                } catch(error) {error_handler(error)}
+    'startdate': async (variables, callback) => {
+        try {
+            let card = {
+                title: "Start Date",
+                element: Elements.DateInput, 
+                element_parameters: {
+                    variable: "startdate",
+                },
+                buttons: [
+                    {name: "Next", destination: 'enddate'},
+                ],
             }
-        },
-        buttons: [
-            {name: "Next", destination: 'end'},
-        ],
+            callback(card, null)
+        } catch(error) {callback(null, error)}
     },
-    'end': {
-        card_type: Elements.MessageCard, 
-        title: "Done",
-        variable: null,
-        parameters: {
-            label: "Investigation complete",
-        },
-        buttons: [
-        ],
+    'enddate': async (variables, callback) => {
+        try {
+            let card = {
+                title: "End Date",
+                element: Elements.DateInput, 
+                element_parameters: {
+                    variable: "enddate",
+                },
+                buttons: [
+                    {name: "Next", destination: 'campaign'},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'campaign': async (variables, callback) => {
+        try {
+            let client_id = variables.client.split(" - ")[0]
+            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/campaign_lookup?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
+            let json = await Helpers.watson_download(url)
+            let campaigns = json.results.map(
+                result => result.campaign_id + " - " + result.campaign_name )
+            let card = {
+                title: "Campaign",
+                element: Elements.AutocompleteInput, 
+                element_parameters: {
+                    label: "Campaign",
+                    variable: "campaign",
+                    data: campaigns,
+                },
+                buttons: [
+                    {name: "Next", destination: 'end'},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'end': async (variables, callback) => {
+        try {
+            let card = {
+                title: "",
+                element: Elements.MessageCard, 
+                element_parameters: {
+                    label: "End of report",
+                },
+                buttons: [],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
     },
 }
+)
