@@ -106,8 +106,36 @@ export class MessageCard extends React.Component {
         super(props);
     }
     render() {
+        let broken_text = this.props.label.split('\n').map(
+            (item, index) => _("span", { key: index }, item, _("br", null) ))
         return [
-            _("section", {key: '1'}, this.props.label),
+            _("section", {key: '1'}, broken_text),
         ]
     }
 }
+
+export class LineGraph extends React.Component {
+    constructor(props) {
+        super(props);
+        this.canvas_id = Math.random().toString().slice(2,18) }
+    componentDidMount() {
+        let context = document.getElementById(this.canvas_id).getContext('2d');
+        let configuration = {
+            type: 'line',
+            data: this.props.data,
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true }}]},
+                responsive: true,
+                animation: { duration: 0 },
+                hover: { animationDuration: 0 },
+                responsiveAnimationDuration: 0, 
+                elements: { line: { tension: 0 }}}}
+        let myChart = new Chart(context, configuration)
+    }
+    render() {
+        return [
+            _("canvas", {key: '1', id: this.canvas_id, width: "400", height: "400"}),
+            _("section", {key: 2}, this.props.label), ]}}

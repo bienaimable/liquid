@@ -131,8 +131,6 @@ export class CardList extends React.Component {
     componentDidUpdate() {
         window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: 'smooth' }) }
     render() {
-        console.log("Variables:")
-        console.log(this.state.variables)
         let cards = []
         if (this.state.visited_node_names.length == 1) {
             let first_node_name = this.state.visited_node_names[0]
