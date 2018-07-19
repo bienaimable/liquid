@@ -14,10 +14,10 @@ nodes = Object.assign(nodes, {
                 title: "Conversion Rate Investigation",
                 element: Elements.MessageCard, 
                 element_parameters: {
-                    label: "Beginning of report",
+                    label: "",
                 },
                 buttons: [
-                    {name: "Next", destination: 'client'},
+                    {name: "Begin", destination: 'client'},
                 ],
             }
             callback(card, null)

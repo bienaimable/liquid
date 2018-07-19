@@ -65,7 +65,14 @@ export class Card extends React.Component {
             { assign: (value) => this.props.assign([element_parameters.variable], value) },
             element_parameters )
 
-        if (final_card || !(current_card)) {
+        if (final_card) {
+            return [
+                _("div", {key: 'key', style: wrapper_style},
+                    _("div", {className: "card", style: report_style},
+                        _("div", {className: "card-content"},
+                            _("span", {className: "card-title"}, this.state.content.title),
+                            _(element, element_props))))]}
+        if (!(current_card)) {
             return [
                 _("div", {key: 'key', style: {}},
                     _("div", {className: "card", style: report_style},

@@ -1,0 +1,16 @@
+version: "3.3"
+services:
+    webserver:
+        image: sherlock-webserver
+        ports:
+          - "52417:80"
+        build:
+            context: .
+            dockerfile: Dockerfile
+        networks:
+            frontend:
+                aliases:
+                    - webserver.sherlock
+networks:
+    frontend:
+        external: true
