@@ -1,7 +1,18 @@
 import * as Elements from "../../static/js/cards/elements.js"
 import * as Helpers from "../../static/js/cards/helpers.js"
-let _ = React.createElement
 
+function checkMaxValue(json, column, value) {
+  var values = [];
+  for (var i in json) {
+    values.push(json[i][column]);
+  }
+  var maxValue = Math.max.apply(null, values);
+  if (maxValue == value) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 function changeInValue(json, columnToCheck) {
   var current_value;
@@ -246,7 +257,7 @@ ${result.values} on this account on ${result.day}.`) }
         } catch(error) {callback(null, error)}
     },
     'cr_setup_capping_rule': async (variables, callback) => {
-        //try {
+        try {
             let client_id = variables.client.split(" - ")[0]
             let campaign_id = variables.campaign.split(" - ")[0]
             let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/capping?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`
@@ -269,19 +280,49 @@ ${result.values} on this account on ${result.day}.`) }
 			    description = description.concat(`In this case, indeed, the capping parameters were changed on ${result.changes}.`) } 
             else {
 			    description = description.concat(`In this case, there was no change regarding capping during the selected period.`) }
-            let graph_data = json.results.map( x => x.campaign_sampling_ratio*100 )
-            let graph_labels = json.results.map( x => x.day )
             let card = {
 			    title: "Capping Parameters",
                 element: Elements.MessageCard, 
                 element_parameters: {
                     label: description },
                 buttons: [
-                    {name: "Next", destination: 'end'},
+                    {name: "Next", destination: 'cr_setup_segmentation_enabled_rule'},
                 ],
             }
             callback(card, null)
-        //} catch(error) {callback(null, error)}
+        } catch(error) {callback(null, error)}
+    },
+    'cr_setup_segmentation_enabled_rule': async (variables, callback) => {
+        try {
+            let client_id = variables.client.split(" - ")[0]
+            let campaign_id = variables.campaign.split(" - ")[0]
+            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/segmentation_is_enabled?start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`
+            let json = await Helpers.watson_download(url)
+			let columns = [ "campaign_capping_starting_day",
+						    "campaign_capping_ending_day",
+						    "daily_capping",
+						    "campaign_capping_since_last_visit",
+						    "partner_capping_since_last_visit",
+						    "campaign_lifetime_capping" ]
+			let result = checkMaxValue(json, "is_segmentation_enabled", 0)
+			let description = `User segmentation can also affect performance `
+            let destination = "cr_setup_banners"
+			if (result) {
+			    description = description.concat(`and it has been used by this campaign during this period.`)
+                destination = "cr_setup_segment_names_rule"}
+            else {
+			    description = description.concat(`but it has not been used by this campaign during this period.`) }
+            let card = {
+			    title: "Segmentation Parameters",
+                element: Elements.MessageCard, 
+                element_parameters: {
+                    label: description },
+                buttons: [
+                    {name: "Next", destination: destination},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
     },
     'end': async (variables, callback) => {
         try {
