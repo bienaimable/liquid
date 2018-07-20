@@ -114,6 +114,25 @@ export class MessageCard extends React.Component {
     }
 }
 
+export class PrintCard extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        let broken_text = this.props.label.split('\n').map(
+            (item, index) => _("span", { key: index }, item, _("br", null) ))
+        return [
+            _("section", {key: '1'}, broken_text),
+            _("a", 
+                { key: '2', 
+                  className: "hide-in-print",
+                  href: 'javascript:void(0)',
+                  onClick: window.print },
+                " Click here to print or save."),
+        ]
+    }
+}
+
 export class LineGraph extends React.Component {
     constructor(props) {
         super(props);

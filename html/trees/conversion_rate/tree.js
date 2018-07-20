@@ -1,16 +1,35 @@
 import * as Elements from "../../static/js/cards/elements.js"
 import * as Helpers from "../../static/js/cards/helpers.js"
 
-function checkMaxValue(json, column, value) {
-  var values = [];
-  for (var i in json) {
-    values.push(json[i][column]);
+function isPercentChangeStable(json, options) {
+  let column = options.column;
+  let threshold = options.threshold;
+  for (var i = 1; i < json.length; i++) {
+    let old_value = json[i - 1][column];
+    let new_value = json[i][column];
+    if (Math.abs(percentChange(new_value, old_value)) >= threshold) {
+      return false;
+    }
   }
-  var maxValue = Math.max.apply(null, values);
-  if (maxValue == value) {
-    return true;
-  } else {
+  return true;
+}
+
+function percentChange(new_value, old_value) {
+  return (new_value - old_value) / old_value;
+}
+
+function isRecentFeed(json, threshold) {
+  var dates = [];
+  for (var i in json) {
+    dates.push(new Date(json[i].feed_import));
+  }
+  var maxDate = new Date(Math.max.apply(null, dates));
+  const oneDay = 24*60*60*1000;
+  var difference = (new Date() - maxDate)/oneDay;
+  if (difference >= threshold) {
     return false;
+  } else {
+    return true;
   }
 }
 
@@ -136,7 +155,7 @@ nodes = Object.assign(nodes, {
                 element: Elements.AutocompleteInput, 
                 element_parameters: {
                     label: "Partner",
-                    variable: "Partner",
+                    variable: "partner",
                     data: partners,
                 },
                 buttons: [
@@ -279,7 +298,7 @@ ${result.values} on this account on ${result.day}.`) }
 			if (result) {
 			    description = description.concat(`In this case, indeed, the capping parameters were changed on ${result.changes}.`) } 
             else {
-			    description = description.concat(`In this case, there was no change regarding capping during the selected period.`) }
+			    description = description.concat(`In this case, there was no change of capping during the selected period.`) }
             let card = {
 			    title: "Capping Parameters",
                 element: Elements.MessageCard, 
@@ -304,7 +323,7 @@ ${result.values} on this account on ${result.day}.`) }
 						    "campaign_capping_since_last_visit",
 						    "partner_capping_since_last_visit",
 						    "campaign_lifetime_capping" ]
-			let result = checkMaxValue(json, "is_segmentation_enabled", 0)
+			let result = json.results.map(x => x.is_segmentation_enabled).includes(1)
 			let description = `User segmentation can also affect performance `
             let destination = "cr_setup_banners"
 			if (result) {
@@ -324,13 +343,209 @@ ${result.values} on this account on ${result.day}.`) }
             callback(card, null)
         } catch(error) {callback(null, error)}
     },
+    'cr_setup_segment_names_rule': async (variables, callback) => {
+        try {
+            let client_id = variables.client.split(" - ")[0]
+            let campaign_id = variables.campaign.split(" - ")[0]
+            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/segment_names?start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`
+            let json = await Helpers.watson_download(url)
+			let result = detectChangeInCount(json, "segment_name")
+			let description = `Changing what segments are applied to the campaign will affect its audience and delivery. `
+			if (result) {
+			    description = description.concat(`A segment (${result.values}) was added or removed from this campaign on ${result.day}.`)}
+            else {
+			    description = description.concat(`However, there were no segment changes on this campaign during this period.`) }
+            let card = {
+			    title: "Segmentation Parameters",
+                element: Elements.MessageCard, 
+                element_parameters: {
+                    label: description },
+                buttons: [
+                    {name: "Next", destination: "cr_setup_banners"},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'cr_setup_banners': async (variables, callback) => {
+        try {
+            let client_id = variables.client.split(" - ")[0]
+            let campaign_id = variables.campaign.split(" - ")[0]
+            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/banners?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`
+            let json = await Helpers.watson_download(url)
+			let result = detectChangeInValue(json, ["banner_count"])
+			let description = ``
+			if (result) {
+			    description = description.concat(`Banners have been changed (${result.changes}) during this period. This can significantly impact campaign performance.`)}
+            else {
+			    description = description.concat(`There were no banner changes on this campaign during this period.`) }
+            let graph_data = json.results.map( x => x.banner_count )
+            let graph_labels = json.results.map( x => x.day )
+            let card = {
+			    title: "Number of Live Banners",
+                element: Elements.LineGraph, 
+                element_parameters: {
+                    label: description,
+                    data: {
+                        labels: graph_labels,
+                        datasets: [{
+                            label: "Banner count",
+                            data: graph_data }]}},
+                buttons: [
+                    {name: "Next", destination: "cr_setup_feed_quality_graph"},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'cr_setup_feed_quality_graph': async (variables, callback) => {
+        try {
+            let partner_id = variables.partner.split(" - ")[0]
+            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/quality_score?partner_id=${partner_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
+            let json = await Helpers.watson_download(url)
+			let description = `Has the feed quality significantly changed over time?`
+            let graph_data = json.results.map( x => x.feed_quality )
+            let graph_labels = json.results.map( x => x.day )
+            let card = {
+			    title: "Feed Check",
+                element: Elements.LineGraph, 
+                element_parameters: {
+                    label: description,
+                    data: {
+                        labels: graph_labels,
+                        datasets: [{
+                            label: "Feed quality (%)",
+                            data: graph_data }]}},
+                buttons: [
+                    {name: "Yes", destination: "cr_feed_quality_text_yes"},
+                    {name: "No", destination: "cr_feed_quality_text_no"},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'cr_feed_quality_text_yes': async (variables, callback) => {
+        try {
+			let description = `The feed quality has changed over time. A large change in feed quality will affect campaign performance.`
+            let card = {
+			    title: "",
+                element: Elements.MessageCard, 
+                element_parameters: {
+                    label: description },
+                buttons: [
+                    {name: "Next", destination: "cr_setup_feed_import_rule"},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'cr_feed_quality_text_no': async (variables, callback) => {
+        try {
+			let description = `The feed quality hasn't changed much over time, so this shouldn't affect performance.`
+            let card = {
+			    title: "",
+                element: Elements.MessageCard, 
+                element_parameters: {
+                    label: description },
+                buttons: [
+                    {name: "Next", destination: "cr_perf_deduplication_ratio_rule"},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'cr_setup_feed_import_rule': async (variables, callback) => {
+        try {
+            let partner_id = variables.partner.split(" - ")[0]
+            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/feed_import?partner_id=${partner_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
+            let json = await Helpers.watson_download(url)
+			let result = isRecentFeed(json, 0)
+			let description = ``
+			if (result) {
+			    description = description.concat(`The feed has been imported recently.`)}
+            else {
+			    description = description.concat(`Last feed import was more than 10 days ago.`) }
+            let card = {
+			    title: "Last Feed Import",
+                element: Elements.MessageCard, 
+                element_parameters: {
+                    label: description },
+                buttons: [
+                    {name: "Next", destination: "cr_perf_deduplication_ratio_rule"},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'cr_perf_deduplication_ratio_rule': async (variables, callback) => {
+        try {
+            let campaign_id = variables.campaign.split(" - ")[0]
+            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/performance/dedup?campaign_id=${campaign_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
+            let json = await Helpers.watson_download(url)
+			let result = isPercentChangeStable(json, "dedup_ratio", 0)
+			let description = ``
+			let destination = ``
+			if (result) {
+			    description = description.concat(`Deduplication ratio is stable.`)
+                //destination = "cr_perf_website_sales_share_graph" }
+                destination = "cr_perf_deduplication_ratio_graph" }
+            else {
+			    description = description.concat(`Deduplication ratio is not stable.`)
+                destination = "cr_perf_deduplication_ratio_graph" }
+            let graph_data = json.results.map( x => x.dedup_ratio )
+            let graph_labels = json.results.map( x => x.day )
+            let card = {
+			    title: "Attribution Model",
+                element: Elements.LineGraph, 
+                element_parameters: {
+                    label: description,
+                    data: {
+                        labels: graph_labels,
+                        datasets: [{
+                            label: "Deduplication ratio (%)",
+                            data: graph_data }]}},
+                buttons: [
+                    {name: "Next", destination: destination},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'cr_perf_deduplication_ratio_graph': async (variables, callback) => {
+        try {
+            let campaign_id = variables.campaign.split(" - ")[0]
+            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/performance/dedup?campaign_id=${campaign_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
+            let json = await Helpers.watson_download(url)
+			let description = `Do you notice any significant variation in the post-click sales?`
+            let graph_data = json.results.map( x => x.post_click_sales )
+            let graph_labels = json.results.map( x => x.day )
+            let card = {
+			    title: "Attribution Model",
+                element: Elements.LineGraph, 
+                element_parameters: {
+                    label: description,
+                    data: {
+                        labels: graph_labels,
+                        datasets: [{
+                            label: "Post-click sales",
+                            data: graph_data }]}},
+                buttons: [
+                    {name: "Yes", destination: "end"},
+                    {name: "No", destination: "end"},
+                    //{name: "Yes", destination: "cr_perf_deduplication_ratio_text"},
+                    //{name: "No", destination: "cr_perf_website_sales_share_graph"},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
     'end': async (variables, callback) => {
         try {
             let card = {
                 title: "",
-                element: Elements.MessageCard, 
+                element: Elements.PrintCard, 
                 element_parameters: {
-                    label: "End of report",
+                    label: "End of report.",
                 },
                 buttons: [],
             }
