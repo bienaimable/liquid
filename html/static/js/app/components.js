@@ -112,7 +112,7 @@ export class CardList extends React.Component {
         super(props);
         this.state = {
             visited_node_names: ["home"],
-            variables: {} }
+            variables: this.props.search_parameters }
         this.assign = (variable, value) => {
             console.log(`${variable} = ${value}`)
             this.setState(

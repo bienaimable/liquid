@@ -106,10 +106,11 @@ export class MessageCard extends React.Component {
         super(props);
     }
     render() {
+        let style = { wordBreak: "break-word" }
         let broken_text = this.props.label.split('\n').map(
             (item, index) => _("span", { key: index }, item, _("br", null) ))
         return [
-            _("section", {key: '1'}, broken_text),
+            _("section", {key: '1', style: style}, broken_text),
         ]
     }
 }
@@ -119,10 +120,11 @@ export class PrintCard extends React.Component {
         super(props);
     }
     render() {
+        let style = { wordBreak: "break-word" }
         let broken_text = this.props.label.split('\n').map(
             (item, index) => _("span", { key: index }, item, _("br", null) ))
         return [
-            _("section", {key: '1'}, broken_text),
+            _("section", {key: '1', style: style}, broken_text),
             _("a", 
                 { key: '2', 
                   className: "hide-in-print",
