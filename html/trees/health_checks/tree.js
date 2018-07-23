@@ -352,9 +352,9 @@ nodes = Object.assign(nodes, {
             console.log(hours_since)
             let description = ``
             if (hours_since >= 24) {
-                description = description.concat(`It's been more than ${hours_since} hours since the last sucessful import. Unless this partner only uses static banners, not updating the catalog regularly can seriously impact performance.`)}
+                description = description.concat(`It's been more than ${hours_since} hours since the last successful import. Unless this partner only uses static banners, not updating the catalog regularly can seriously impact performance.`)}
             else {
-                description = description.concat(`It's been only ${hours_since} hours since the last sucessful import. Continuing to update the catalog regularly will allow good performance.`)}
+                description = description.concat(`It's been only ${hours_since} hours since the last successful import. Continuing to update the catalog regularly will allow good performance.`)}
             let card = {
                 title: "Last Successful Import",
                 element: Elements.MessageCard, 

@@ -4,40 +4,16 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+      <link rel="stylesheet" href="/static/css/main.css">
       <link href="https://fonts.googleapis.com/css?family=Didact+Gothic" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css?family=Merienda" rel="stylesheet">
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <link rel="icon" href="/favicon.ico" type="image/x-icon">
-      <title>Sherlock</title>
+      <link rel="icon" type="image/png" href="/static/img/favicon.png">
+      <title>Flow</title>
 </head>
-<style>
-.application {
-    display: grid;
-    grid-template-columns: auto 500px auto;
-    grid-template-rows: 60px auto;
-    grid-template-areas: 
-    "header header header"
-    ". content .";
-}
-.header {
-    grid-area: header;
-    font-size: 1.9em;
-    padding: 0.5em;
-    padding-left: 0.8em;
-    background-color: #FAFAFA;
-    border-bottom: 1px solid #EEEEEE;
-    }
-.content {
-    grid-area: content;
-    padding-top: 3em;
-}
-a {
-  color: black;
-  text-decoration: none; /* no underline */
-}
-</style>
 <body>
     <section class="application">
-      <section class="header"><a href='/'>Sherlock</a></section>
+      <section class="header"><a href='/'><img src='/static/img/favicon.png' height="48" width="48">Flow</a></section>
       <section class="content">
         <section id="card_slot">
           <a href="trees/?_tree=health_checks">
