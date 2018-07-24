@@ -19,10 +19,22 @@
     padding-left: 0.4em;
     background-color: #FAFAFA;
     border-bottom: 1px solid #EEEEEE;
-    color: #3fa9af;
     }
-.header a {
-    color: #3fa9af;
+.header-link {
+    display: grid;
+    grid-template-columns: 50px auto;
+    grid-template-rows: auto;
+    grid-template-areas: 
+    "logo title";
+    }
+.header-logo {
+    grid-area: logo;
+    }
+.header-logo img {
+    filter: brightness(0.01);
+    }
+.header-title {
+    grid-area: title;
     }
 .content {
     grid-area: content;
