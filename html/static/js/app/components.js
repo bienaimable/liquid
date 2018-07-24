@@ -2,20 +2,32 @@ let _ = React.createElement
 
 export class Card extends React.Component {
     constructor(props) {
-        super(props);
+        super(props)
+        this.trial = 0
         this.state = {
             loaded: false,
             error: false,
             data: [] }}
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
     getContent() {
         this.props.content_function( 
             this.props.variables,
-            (card_content, error) => {
+            async (card_content, error) => {
                 if (error != null) {
-                    this.setState({
-                        error: true,
-                        error_message: error})} 
+                    console.log(error)
+                    console.log('Automatically retrying')
+                    this.trial++
+                    if (this.trial > 5) {
+                        this.setState({
+                            error: true,
+                            error_message: error})}
+                    else {
+                        await this.sleep(2000)
+                        this.getContent()}}
                 else {
+                    this.trial = 0
                     this.setState({
                         loaded: true,
                         content: card_content})}})}
