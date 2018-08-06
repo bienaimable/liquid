@@ -35,20 +35,21 @@ export class Card extends React.Component {
                         this.setState({ticker: card_content.autoskip})
                         this.interval_ticker = setInterval(
                           () => this.tick(),
-                          1000)}}})}
+                          1000)}
+                    this.scrollInView()}})}
     tick() {
         if (this.state.ticker <= 0){
             this.props.next_function(this.state.content.buttons.slice(-1)[0].destination)
             clearInterval(this.interval_ticker)}
-        else {
-            this.setState({ticker: this.state.ticker - 1})}}
+        this.setState({ticker: this.state.ticker - 1})}
     componentWillUnmount() {
         if (this.interval_ticker !== undefined){
             clearInterval(this.interval_ticker)}}
     componentDidMount() {
+        this.scrollInView()
         this.getContent()
         }
-    componentDidUpdate() {
+    scrollInView() {
         setTimeout(() => window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: 'smooth' }), 1 )}
     render() {
         let error_card = this.state.error == true
@@ -124,7 +125,7 @@ export class Card extends React.Component {
                       onClick: () => this.props.next_function(button.destination) }, 
                     button.name ))
         let ticker_message = []
-        if (this.state.ticker !== undefined){
+        if (this.state.ticker !== undefined && this.state.ticker >= 0){
             ticker_message = [_("span", {key: 'ticker'}, `Automatically continuing in ${this.state.ticker}s`)]}
         let buttons = [ ...back_button, ...next_buttons, ...ticker_message]
 
@@ -160,8 +161,6 @@ export class CardList extends React.Component {
                 visited_node_names: [ 
                     ...this.state.visited_node_names, 
                     destination ]})}}
-    componentDidUpdate() {
-        window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: 'smooth' }) }
     render() {
         let cards = []
         if (this.state.visited_node_names.length == 1) {
