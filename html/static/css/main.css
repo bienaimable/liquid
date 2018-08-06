@@ -1,8 +1,8 @@
 @media print{
-   .hide-in-print{
+    .hide-in-print{
        display:none;
-   }
-}
+       }
+    }
 .application {
     display: grid;
     grid-template-columns: auto 500px auto;
@@ -10,7 +10,7 @@
     grid-template-areas: 
     "header header header"
     ". content .";
-}
+    }
 .header {
     grid-area: header;
     font-family: 'Merienda', cursive;
@@ -39,8 +39,8 @@
 .content {
     grid-area: content;
     padding-top: 3em;
-}
+    }
 a {
-  color: black;
-  text-decoration: none; /* no underline */
-}
+    color: black;
+    text-decoration: none; /* no underline */
+    }

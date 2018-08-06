@@ -30,8 +30,24 @@ export class Card extends React.Component {
                     this.trial = 0
                     this.setState({
                         loaded: true,
-                        content: card_content})}})}
-    componentDidMount() {this.getContent()}
+                        content: card_content})
+                    if (card_content.autoskip !== undefined){
+                        this.setState({ticker: card_content.autoskip})
+                        this.interval_ticker = setInterval(
+                          () => this.tick(),
+                          1000)}}})}
+    tick() {
+        if (this.state.ticker <= 0){
+            this.props.next_function(this.state.content.buttons.slice(-1)[0].destination)
+            clearInterval(this.interval_ticker)}
+        else {
+            this.setState({ticker: this.state.ticker - 1})}}
+    componentWillUnmount() {
+        if (this.interval_ticker !== undefined){
+            clearInterval(this.interval_ticker)}}
+    componentDidMount() {
+        this.getContent()
+        }
     componentDidUpdate() {
         setTimeout(() => window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: 'smooth' }), 1 )}
     render() {
@@ -107,7 +123,11 @@ export class Card extends React.Component {
                       href: 'javascript:void(0)',
                       onClick: () => this.props.next_function(button.destination) }, 
                     button.name ))
-        let buttons = [ ...back_button, ...next_buttons ]
+        let ticker_message = []
+        if (this.state.ticker !== undefined){
+            ticker_message = [_("span", {key: 'ticker'}, `Automatically continuing in ${this.state.ticker}s`)]}
+        let buttons = [ ...back_button, ...next_buttons, ...ticker_message]
+
         return [
             _("div", {key: 'key', style: wrapper_style},
                 _("div", {className: "card", style: {}},

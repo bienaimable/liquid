@@ -238,6 +238,7 @@ ${result.values} on this account on ${result.day}.`) }
                 buttons: [
                     {name: "Next", destination: 'cr_setup_sampling_ratio_rule'},
                 ],
+                autoskip: 5,
             }
             callback(card, null)
         } catch(error) {callback(null, error)}
@@ -271,6 +272,7 @@ ${result.values} on this account on ${result.day}.`) }
                 buttons: [
                     {name: "Next", destination: 'cr_setup_capping_rule'},
                 ],
+                autoskip: 5,
             }
             callback(card, null)
         } catch(error) {callback(null, error)}
@@ -307,6 +309,7 @@ ${result.values} on this account on ${result.day}.`) }
                 buttons: [
                     {name: "Next", destination: 'cr_setup_segmentation_enabled_rule'},
                 ],
+                autoskip: 5,
             }
             callback(card, null)
         } catch(error) {callback(null, error)}
@@ -339,6 +342,7 @@ ${result.values} on this account on ${result.day}.`) }
                 buttons: [
                     {name: "Next", destination: destination},
                 ],
+                autoskip: 5,
             }
             callback(card, null)
         } catch(error) {callback(null, error)}
@@ -363,6 +367,7 @@ ${result.values} on this account on ${result.day}.`) }
                 buttons: [
                     {name: "Next", destination: "cr_setup_banners"},
                 ],
+                autoskip: 5,
             }
             callback(card, null)
         } catch(error) {callback(null, error)}
@@ -391,6 +396,7 @@ ${result.values} on this account on ${result.day}.`) }
                         datasets: [{
                             label: "Banner count",
                             data: graph_data }]}},
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: "cr_setup_feed_quality_graph"},
                 ],
@@ -470,6 +476,7 @@ ${result.values} on this account on ${result.day}.`) }
                 element: Elements.MessageCard, 
                 element_parameters: {
                     label: description },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: "cr_perf_deduplication_ratio_rule"},
                 ],
@@ -504,6 +511,7 @@ ${result.values} on this account on ${result.day}.`) }
                         datasets: [{
                             label: "Deduplication ratio (%)",
                             data: graph_data }]}},
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: destination},
                 ],
