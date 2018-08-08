@@ -30,9 +30,26 @@ export class Card extends React.Component {
                     this.trial = 0
                     this.setState({
                         loaded: true,
-                        content: card_content})}})}
-    componentDidMount() {this.getContent()}
-    componentDidUpdate() {
+                        content: card_content})
+                    if (card_content.autoskip !== undefined){
+                        this.setState({ticker: card_content.autoskip})
+                        this.interval_ticker = setInterval(
+                          () => this.tick(),
+                          1000)}
+                    this.scrollInView()}})}
+    tick() {
+        if (this.state.ticker <= 0){
+            this.props.next_function(this.state.content.buttons.slice(-1)[0].destination)
+            clearInterval(this.interval_ticker)}
+        this.setState({ticker: this.state.ticker - 1})}
+    componentWillUnmount() {
+        if (this.interval_ticker !== undefined){
+            clearInterval(this.interval_ticker)}}
+    componentDidMount() {
+        this.scrollInView()
+        this.getContent()
+        }
+    scrollInView() {
         setTimeout(() => window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: 'smooth' }), 1 )}
     render() {
         let error_card = this.state.error == true
@@ -107,7 +124,11 @@ export class Card extends React.Component {
                       href: 'javascript:void(0)',
                       onClick: () => this.props.next_function(button.destination) }, 
                     button.name ))
-        let buttons = [ ...back_button, ...next_buttons ]
+        let ticker_message = []
+        if (this.state.ticker !== undefined && this.state.ticker >= 0){
+            ticker_message = [_("span", {key: 'ticker'}, `Automatically continuing in ${this.state.ticker}s`)]}
+        let buttons = [ ...back_button, ...next_buttons, ...ticker_message]
+
         return [
             _("div", {key: 'key', style: wrapper_style},
                 _("div", {className: "card", style: {}},
@@ -140,8 +161,6 @@ export class CardList extends React.Component {
                 visited_node_names: [ 
                     ...this.state.visited_node_names, 
                     destination ]})}}
-    componentDidUpdate() {
-        window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: 'smooth' }) }
     render() {
         let cards = []
         if (this.state.visited_node_names.length == 1) {

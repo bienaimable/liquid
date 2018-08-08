@@ -141,7 +141,7 @@
     grid-template-areas:
     "header header header"
     ". content .";
-}
+    }
 .header {
     grid-area: header;
     font-family: 'Merienda', cursive;
@@ -170,7 +170,7 @@
 .content {
     grid-area: content;
     padding-top: 3em;
-}
+    }
 a {
   color: #555;
   text-decoration: none; /* no underline */

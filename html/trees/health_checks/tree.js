@@ -83,7 +83,51 @@ nodes = Object.assign(nodes, {
                     label: description,
                 },
                 buttons: [
-                    {name: "Next", destination: 'logo_image_url'},
+                    {name: "Change homepage URL", destination: 'change_homepage_url'},
+                    {name: "Continue", destination: 'logo_image_url'},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'change_homepage_url': async (variables, callback) => {
+        try {
+            let partner_id = variables.partner.split(" - ")[0]
+            let url = `https://top.criteo.com/app/#/PartnerEdit/partner/${partner_id}`
+            let description = `Change URL here: ${url}`
+            let card = {
+                title: "",
+                element: Elements.MessageCard, 
+                element_parameters: {
+                    label: description,
+                },
+                buttons: [
+                    {name: "Continue", destination: 'confirm_homepage_url'},
+                ],
+            }
+            callback(card, null)
+        } catch(error) {callback(null, error)}
+    },
+    'confirm_homepage_url': async (variables, callback) => {
+        try {
+            let partner_id = variables.partner.split(" - ")[0]
+            let url = `http://settings.oea.criteois.lan/api/v1/topWs/partners/GetPartner?partnerId=${partner_id}&allData=false`
+            let json = await Helpers.download(url)
+            let homepage_url = json.logoUrl
+            let description = ``
+            if (homepage_url) {
+                description = `The URL is now set up to: ${homepage_url}` }
+            else {
+                description = `No homepage URL has been set on this account. This may reduce performance if users are unable to click on some parts of the banners.`}
+            let card = {
+                title: "",
+                element: Elements.MessageCard, 
+                element_parameters: {
+                    label: description,
+                },
+                autoskip: 5,
+                buttons: [
+                    {name: "Continue", destination: 'logo_image_url'},
                 ],
             }
             callback(card, null)
@@ -106,6 +150,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'cross_device_enabled'},
                 ],
@@ -130,6 +175,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'ebs_enabled'},
                 ],
@@ -154,6 +200,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'cross_device_sales'},
                 ],
@@ -178,6 +225,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'filler_campaign'},
                 ],
@@ -202,6 +250,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'number_of_comments'},
                 ],
@@ -225,6 +274,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'rtb_cross_matched_impression'},
                 ],
@@ -249,6 +299,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'facebook_terms_and_conditions'},
                 ],
@@ -273,6 +324,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'all_campaigns_in_ab_test'},
                 ],
@@ -301,6 +353,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'dising_settings'},
                 ],
@@ -334,6 +387,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'last_import_date'},
                 ],
@@ -361,6 +415,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'feed_safety'},
                 ],
@@ -385,6 +440,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'virtual_revenue_mismatch'},
                 ],
@@ -409,6 +465,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'impression_capping'},
                 ],
@@ -433,6 +490,7 @@ nodes = Object.assign(nodes, {
                 element_parameters: {
                     label: description,
                 },
+                autoskip: 5,
                 buttons: [
                     {name: "Next", destination: 'end'},
                 ],
