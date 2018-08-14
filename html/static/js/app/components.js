@@ -39,8 +39,8 @@ export class Card extends React.Component {
                     this.scrollInView()}})}
     tick() {
         if (this.state.ticker <= 0){
-            this.props.next_function(this.state.content.buttons.slice(-1)[0].destination)
-            clearInterval(this.interval_ticker)}
+            clearInterval(this.interval_ticker)
+            this.props.next_function(this.state.content.buttons.slice(-1)[0].destination)}
         this.setState({ticker: this.state.ticker - 1})}
     componentWillUnmount() {
         if (this.interval_ticker !== undefined){

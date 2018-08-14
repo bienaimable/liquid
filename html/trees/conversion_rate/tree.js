@@ -123,7 +123,7 @@ nodes = Object.assign(nodes, {
             let client_id = variables.client.split(" - ")[0]
             let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/new_campaign?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
             let json = await Helpers.watson_download(url)
-			let result = detectChangeInCount(json, "campaign_name")
+			let result = Functions.detectChangeInCount(json, "campaign_name")
 			let description = `Change of status on other campaigns of the same client can affect your campaign conversion rate. `
 			if (result) {
 			    description = description.concat(`In this case, some campaigns have been activated or paused during the time period mentioned: 
@@ -150,7 +150,7 @@ ${result.values} on this account on ${result.day}.`) }
             let campaign_id = variables.campaign.split(" - ")[0]
             let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/sampling_ratio?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`
             let json = await Helpers.watson_download(url)
-			let result = detectChangeInValue(json, ["campaign_sampling_ratio"])
+			let result = Functions.detectChangeInValue(json, ["campaign_sampling_ratio"])
 			let description = `Changing the sampling ratio can significantly impact campaign performance. `
 			if (result) {
 			    description = description.concat(`In this case, indeed, the sampling ratio was changed on ${result.day}.`) } 
@@ -190,7 +190,7 @@ ${result.values} on this account on ${result.day}.`) }
 						    "campaign_capping_since_last_visit",
 						    "partner_capping_since_last_visit",
 						    "campaign_lifetime_capping" ]
-			let result = detectChangeInValue(json, columns)
+			let result = Functions.detectChangeInValue(json, columns)
             let last_item = json.results.slice(-1)[0]
             let pretty_json = Object.keys(last_item).map(
                 (key, index) => `${key}: ${last_item[key]}\n` )
@@ -254,7 +254,7 @@ ${result.values} on this account on ${result.day}.`) }
             let campaign_id = variables.campaign.split(" - ")[0]
             let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/segment_names?start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`
             let json = await Helpers.watson_download(url)
-			let result = detectChangeInCount(json, "segment_name")
+			let result = Functions.detectChangeInCount(json, "segment_name")
 			let description = `Changing what segments are applied to the campaign will affect its audience and delivery. `
 			if (result) {
 			    description = description.concat(`A segment (${result.values}) was added or removed from this campaign on ${result.day}.`)}
@@ -279,7 +279,7 @@ ${result.values} on this account on ${result.day}.`) }
             let campaign_id = variables.campaign.split(" - ")[0]
             let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/banners?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`
             let json = await Helpers.watson_download(url)
-			let result = detectChangeInValue(json, ["banner_count"])
+			let result = Functions.detectChangeInValue(json, ["banner_count"])
 			let description = ``
 			if (result) {
 			    description = description.concat(`Banners have been changed (${result.changes}) during this period. This can significantly impact campaign performance.`)}
@@ -366,7 +366,7 @@ ${result.values} on this account on ${result.day}.`) }
             let partner_id = variables.partner.split(" - ")[0]
             let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/feed_import?partner_id=${partner_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
             let json = await Helpers.watson_download(url)
-			let result = isRecentFeed(json, 0)
+			let result = Functions.isRecentFeed(json, 0)
 			let description = ``
 			if (result) {
 			    description = description.concat(`The feed has been imported recently.`)}
@@ -390,7 +390,7 @@ ${result.values} on this account on ${result.day}.`) }
             let campaign_id = variables.campaign.split(" - ")[0]
             let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/performance/dedup?campaign_id=${campaign_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
             let json = await Helpers.watson_download(url)
-			let result = isPercentChangeStable(json, "dedup_ratio", 0)
+			let result = Functions.isPercentChangeStable(json, "dedup_ratio", 0)
 			let description = ``
 			let destination = ``
 			if (result) {
