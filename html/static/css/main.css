@@ -131,8 +131,9 @@
 @page { size: auto;  margin: 0mm; }
 
 * {
-  color: #555;
+  color: #30385d;
   box-sizing: border-box;
+  font-family: 'Didact Gothic', Roboto, Open Sans, sans-serif;
 }
 .application {
     display: grid;
@@ -146,10 +147,12 @@
     grid-area: header;
     font-family: 'Merienda', cursive;
     font-size: 2.6em;
-    padding: 0.1em;
-    padding-left: 0.4em;
-    background-color: #FAFAFA;
-    border-bottom: 1px solid #EEEEEE;
+    /* padding: 0.1em; */
+    padding: 2px 20px;
+    background-color: #1a1f2b;
+    /* border-bottom: 1px solid #EEEEEE; */
+    -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
     }
 .header-link {
     display: grid;
@@ -162,7 +165,7 @@
     grid-area: logo;
     }
 .header-logo img {
-    filter: brightness(0.01);
+    /* filter: brightness(0.01); */
     }
 .header-title {
     grid-area: title;
@@ -179,4 +182,35 @@ a {
     vertical-align: middle;
     display: inline;
     margin-right: 13px;
+}
+.card .card-content .card-title {
+  margin-bottom: 15px;
+}
+.card .card-action {
+  padding-left: 0;
+  padding-right: 0;
+  font-size: 15px;
+  }
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-small):not(.btn-large):not(.btn-floating) {
+    color: #496393;
+    color: #84a4ce;
+  }
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-small):not(.btn-large):not(.btn-floating):hover {
+    color: #84a4ce;
+  }
+.card .card-action:last-child {
+    border-color: #cfe4f3;
+    margin-top: 15px;
+  }
+  .card .card-action span {
+  color: #aaa;
+  display: block;
+  float: right;
+  margin-top: 15px;
+  font-size: 11px;
+    }
+.card .input-field + .card-action {
+  border: none;
+margin-top: 0;
+padding-top: 0;
 }
