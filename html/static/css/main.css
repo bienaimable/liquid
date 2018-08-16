@@ -142,7 +142,7 @@
     grid-template-areas:
     "header header header"
     ". content .";
-    }
+}
 .header {
     grid-area: header;
     font-family: 'Merienda', cursive;
@@ -169,11 +169,11 @@
     }
 .header-title {
     grid-area: title;
-    }
+}
 .content {
     grid-area: content;
     padding-top: 3em;
-    }
+}
 a {
   color: #555;
   text-decoration: none; /* no underline */
@@ -184,33 +184,77 @@ a {
     margin-right: 13px;
 }
 .card .card-content .card-title {
-  margin-bottom: 15px;
-}
+    margin-bottom: 15px;
+    }
 .card .card-action {
-  padding-left: 0;
-  padding-right: 0;
-  font-size: 15px;
-  }
+    padding-left: 0;
+    padding-right: 0;
+    font-size: 15px;
+    }
 .card .card-action a:not(.btn):not(.btn-large):not(.btn-small):not(.btn-large):not(.btn-floating) {
     color: #496393;
     color: #84a4ce;
-  }
+    }
 .card .card-action a:not(.btn):not(.btn-large):not(.btn-small):not(.btn-large):not(.btn-floating):hover {
     color: #84a4ce;
-  }
+    }
 .card .card-action:last-child {
     border-color: #cfe4f3;
     margin-top: 15px;
-  }
-  .card .card-action span {
-  color: #aaa;
-  display: block;
-  float: right;
-  margin-top: 15px;
-  font-size: 11px;
+    }
+.card .card-action span {
+    color: #aaa;
+    display: block;
+    float: right;
+    font-size: 11px;
+    margin-top: 25px;
     }
 .card .input-field + .card-action {
-  border: none;
-margin-top: 0;
-padding-top: 0;
+    border: none;
+    margin-top: 0;
+    padding-top: 0;
+}
+.datepicker-date-display {
+    background-color: #30385d;
+    }
+.datepicker-cancel, .datepicker-clear, .datepicker-today, .datepicker-done {
+    color: #84a4ce;
+    }
+.datepicker-table td.is-today {
+    color: #84a4ce;
+    }
+.datepicker-date-display .date-text {
+    color: #fff;
+    }
+.datepicker-table td.is-selected {
+    background-color: #84a4ce;
+    color: #fff !important;
+}
+input:not([type]):focus:not([readonly]),
+input[type=text]:not(.browser-default):focus:not([readonly]),
+input[type=password]:not(.browser-default):focus:not([readonly]),
+input[type=email]:not(.browser-default):focus:not([readonly]),
+input[type=url]:not(.browser-default):focus:not([readonly]),
+input[type=time]:not(.browser-default):focus:not([readonly]),
+input[type=date]:not(.browser-default):focus:not([readonly]),
+input[type=datetime]:not(.browser-default):focus:not([readonly]),
+input[type=datetime-local]:not(.browser-default):focus:not([readonly]),
+input[type=tel]:not(.browser-default):focus:not([readonly]),
+input[type=number]:not(.browser-default):focus:not([readonly]),
+input[type=search]:not(.browser-default):focus:not([readonly]),
+textarea.materialize-textarea:focus:not([readonly]) {
+    border-bottom: 1px solid #84a4ce;
+    -webkit-box-shadow: 0 1px 0 0 #84a4ce;
+    box-shadow: 0 1px 0 0 #84a4ce;
+}
+.dropdown-content li>a,
+.dropdown-content li>span{
+    font-size:16px;
+    color:#496393;
+    display:block;
+    line-height:22px;
+    padding:14px 16px
+}
+input[type=text]:not(.browser-default)  {
+  color: #496393;
 }
