@@ -39,12 +39,12 @@ ${result.values} on this account on ${result.day}.`) }
             let campaign_id = variables.campaign.split(" - ")[0]
             let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/sampling_ratio?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`
             let json = await Helpers.watson_download(url)
-			let result = Functions.detectChangeInValue(json, ["campaign_sampling_ratio"])
+            let all_equal = json.results.map(x => x.campaign_sampling_ratio).every(y => y === json.results[0].campaign_sampling_ratio)
 			let description = `Changing the sampling ratio can significantly impact campaign performance. `
-			if (result) {
-			    description = description.concat(`In this case, indeed, the sampling ratio was changed on ${result.day}.`) } 
-            else {
+			if (all_equal) {
 			    description = description.concat(`In this case, there was no change in sampling ratio during the selected period.`) }
+            else {
+			    description = description.concat(`In this case, indeed, the sampling ratio was changed on ${result.day}.`) } 
             let graph_data = json.results.map( x => x.campaign_sampling_ratio*100 )
             let graph_labels = json.results.map( x => x.day )
             let card = {
@@ -79,16 +79,21 @@ ${result.values} on this account on ${result.day}.`) }
 						    "campaign_capping_since_last_visit",
 						    "partner_capping_since_last_visit",
 						    "campaign_lifetime_capping" ]
-			let result = Functions.detectChangeInValue(json, columns)
+            let changed_columns = []
+            for (let column of columns) {
+                let all_equal = json.results.map(x => x.[column]).every(y => y === json.results[0].[column])
+                if (!(all_equal)) {
+                    changed_columns.push(column) 
+                }
+            }
             let last_item = json.results.slice(-1)[0]
             let pretty_json = Object.keys(last_item).map(
                 (key, index) => `${key}: ${last_item[key]}\n` )
             pretty_json = pretty_json.join('')
-            
 			let description = `${pretty_json}
             Changing the capping parameters can significantly impact campaign performance. `
-			if (result) {
-			    description = description.concat(`In this case, indeed, the capping parameters were changed on ${result.changes}.`) } 
+			if (changed_columns.length) {
+			    description = description.concat(`In this case, indeed, the capping parameters were changed on ${changed_columns}.`) } 
             else {
 			    description = description.concat(`In this case, there was no change of capping during the selected period.`) }
             let card = {
@@ -170,12 +175,12 @@ ${result.values} on this account on ${result.day}.`) }
             let campaign_id = variables.campaign.split(" - ")[0]
             let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/banners?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`
             let json = await Helpers.watson_download(url)
-			let result = Functions.detectChangeInValue(json, ["banner_count"])
+            let all_equal = json.results.map(x => x.banner_count).every(y => y === json.results[0].banner_count)
 			let description = ``
-			if (result) {
-			    description = description.concat(`Banners have been changed (${result.changes}) during this period. This can significantly impact campaign performance.`)}
-            else {
+			if (all_equal) {
 			    description = description.concat(`There were no banner changes on this campaign during this period.`) }
+            else {
+			    description = description.concat(`Banners have been changed (${result.changes}) during this period. This can significantly impact campaign performance.`)}
             let graph_data = json.results.map( x => x.banner_count )
             let graph_labels = json.results.map( x => x.day )
             let card = {
