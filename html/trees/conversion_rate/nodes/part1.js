@@ -81,7 +81,7 @@ ${result.values} on this account on ${result.day}.`) }
 						    "campaign_lifetime_capping" ]
             let changed_columns = []
             for (let column of columns) {
-                let all_equal = json.results.map(x => x.[column]).every(y => y === json.results[0].[column])
+                let all_equal = json.results.map(x => x[column]).every(y => y === json.results[0][column])
                 if (!(all_equal)) {
                     changed_columns.push(column) 
                 }
