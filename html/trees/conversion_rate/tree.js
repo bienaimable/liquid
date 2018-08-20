@@ -28,6 +28,7 @@ nodes = Object.assign(nodes, {
                 ],
             }
             callback(card, null)
+            Helpers.download("http://settings.oea.criteois.lan/api/v1/topWs/advertisers/GetAdvertisers?limit=0")
         } catch(error) {callback(null, error)}
     },
     'end': async (variables, callback) => {

@@ -8,9 +8,8 @@ export let nodes = {}
 nodes = Object.assign(nodes, {
     'numberofcampaigns': async (variables, callback) => {
         try {
-            let client_id = variables.client.split(" - ")[0]
-            let url = `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/new_campaign?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}`
-            let json = await Helpers.watson_download(url)
+            let json = await Helpers.watson_download(
+                `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/new_campaign?client_id=${variables.client.split(" - ")[0]}&start_date=${variables.startdate}&end_date=${variables.enddate}`)
 			let result = Functions.detectChangeInCount(json, "campaign_name")
 			let description = `Change of status on other campaigns of the same client can affect your campaign conversion rate. `
 			if (result) {
@@ -30,6 +29,8 @@ ${result.values} on this account on ${result.day}.`) }
                 autoskip: 5,
             }
             callback(card, null)
+            Helpers.watson_download(
+                `http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/sampling_ratio?client_id=${variables.client.split(" - ")[0]}&start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${variables.campaign.split(" - ")[0]}`)
         } catch(error) {callback(null, error)}
     },
     'cr_setup_sampling_ratio_rule': async (variables, callback) => {
@@ -134,6 +135,8 @@ ${result.values} on this account on ${result.day}.`) }
                 autoskip: 5,
             }
             callback(card, null)
+            Helpers.watson_download(`http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/segment_names?start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`)
+            Helpers.watson_download(`http://watson.oea.criteois.lan/api/v1/query/sherlock/setup/banners?client_id=${client_id}&start_date=${variables.startdate}&end_date=${variables.enddate}&campaign_id=${campaign_id}`)
         } catch(error) {callback(null, error)}
     },
     'cr_setup_segment_names_rule': async (variables, callback) => {
